@@ -1,0 +1,513 @@
+1. Create all directory structure
+2. Create a NPM Project and install all dependencies
+    - dependencies
+        - express
+        - ejs
+        - express-ejs-layouts
+    - Dev dependencies
+        - nodemon
+3. Create Express Server - Create a server.js file
+4. Git setup and first commit
+
+
+Ab apn ko apne is project mei js k modern features use karne
+hai scss use karna hai toh jo bhi naye naye features hai
+apn ko wo sab apne project ke andar use karna hai toh what we need to do?
+
+
+5. We need Laravel Mix, it is a tool which which compile all of it and
+put in under public folder, Bohot saare tools aate hai aise toh
+Like
+Gulp
+WebPack
+Laravel Mix and all
+
+Agar apn directly Webpack use karte toh bohot sara configuration karna padta apn ko
+aur agar apn Laravel Mix use karte hai toh apn ko conf na k barabar use karan hota and 
+it internally uses the Webpack
+
+"npm install laravel-mix --save-dev -D" It will be used in dev env thats why -D
+
+Now lets create a file in our root
+webpack.mix.js
+Now,
+Paste the below code:
+// webpack.mix.js
+
+let mix = require('laravel-mix');
+
+mix.js('src/app.js', 'dist').setPublicPath('dist');
+
+"As we know what laravel is gonna do?", it will compile the file from resources folder
+/js and /scss to the public folder /js and /css
+
+6. Install Tailwind.css
+
+7. Now we gonna create a Home page now to do so we will create a different variables 
+that with time we will change directly the variable and we don not need to look after 
+the code for the changes.
+
+Create a file _variables.scss under resources/scss
+Now, _ means that it is a naming convention that we will be including this file in someother
+file.
+Now we need to include this file in resources/scss/app.scss
+How we will do it:
+app.scss--->
+@import './variables';
+This is it.
+
+
+Write a code under app.scss 
+and compile it with npx mix
+
+7. Go to home.ejs lets write a home page code and make use of tailwind.css classes
+
+8. Create a Order Now Button
+9. Give an styling to it
+10. Now create a new page CART page ---> cart.ejs, Create a Route first:
+    under server.js
+    app.get('/cart', (req, res)=>{
+    res.render('Customer/cart');
+})
+
+Now under resources/views/
+Create a folder Customer and under that create cart.ejs
+And above, add the route to it.
+
+Ab kya ha na there is one portion of the page which is repetitive like nav bar
+So its good to create a new file under "layout.ejs"
+toh kya hai na ki layout-ejs module will look for layout.ejs file aur is mei apn wo wala code daal denge
+layout.ejs -----> Keep the common part
+
+
+11.
+Now lets create a new page a CART page
+Here in this page it will consist of conditional pages which will appear for certain cases like 
+if user have something in his cart then other page will appear and 
+if user cart is empty then some other page will appear
+and yes if user adds some items to his cart but he/she is not login then cart will have item but login button will
+appear and then only user will be able to place the order.
+
+
+12.
+Lets create a Login Page and Register Page
+Under views create a new folder name auth and create a file inside of it 
+1. login.ejs
+2. register.ejs
+
+Create a route for login.ejs /login page
+Create a route for register.ejs /register page
+
+
+13.
+Move Routes to Routes Files
+Abhi tak sare routes apne server file ke andar hai jo ki hame server.js mei nai chahiye
+bcz bohot sare routes hone wale hai apne project mei agar apn saare routes server.js file mei rakhenge toh
+ye file bohot badi ho jayegii
+
+As we have the folder structure ready as routes --> 2 files hai 
+1. web.js
+2. api.js
+
+We will keep all the routes under web.js file
+
+
+Inside this file 
+Lets create a function
+
+function initRoutes(app)
+{
+    app.get('/', (req, res)=>
+    {
+        res.render('home');
+    })
+
+    //Baki sare routes bhi yahi daal do
+}
+
+module.exports = initRoutes;
+
+Now remember one thing every file inside a node project is a module
+we will export this module
+Yahan par apn ne ek function ko export kar diya hai
+
+Now we need to import this exported file inside a server.js file
+as this is a local module so we have to give a relative Path
+
+require('./routes/web.js')(app)
+
+14.
+
+Now do one thing, create a controllers 
+Under
+app/http/controllers
+
+
+function homeController()
+{
+    return {
+        index(req, res)
+        {
+            res.render('home');
+        }
+    }
+}
+
+module.exports = homeController;
+
+
+
+Now Do one more thing import the same exported module inside the web.js file
+
+and under route
+const homeController = require('../app/http/controllers/homeController');
+
+
+app.get('/', homeController().index)
+
+
+app.get ke andar jo second argument rehta hai na usme directly req, res pass ho jaate hai toh 
+
+homeController.js file ke andar
+
+aisa kuch likhna padega apn ko
+return {
+        index(req, res)
+        {
+            res.render('home');
+        }
+    }
+
+Same process needs to be followed for different controllers
+------------------------------------------------------------
+
+15.
+
+Now Create a New Account in Mongo Atlas
+Create a Free Cluster
+Setup a Connection String with Username and Password
+Copy the same string and Connect to a MongoDB using MongoCompass which we have downloaded in our system
+and using the connection string connect with mongodb 
+Now Create a New Database
+Create a New Table which is referred as Collection in MongoDB
+Now upload one file to the same collection a JSON file which will have all the pizza names and data accordingly
+
+
+
+Now we want ki DB ke collection mei se y saara data uth kar ke apne Home Page ke menu section me aajaye baari baari se
+So How to achieve it?
+We need to provide a Database Connection to our Project so we will be requiring a package called Mongoose
+
+
+
+"npm install mongoose"
+
+Toh basically mongoose ke madad se apn apne mongodb ka connection kar sakte apne application se
+
+16.
+
+Database Connection
+
+Go to server.js file
+
+
+//Database Connection
+const url = 'mongodb://localhost:27017/PizzaDB';
+mongoose.connect(url, { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true, useFindAndModify: true});
+const connection = mongoose.connection;
+connection.once('open', ()=>{
+    console.log('Database Connected...');
+}).catch(err =>{
+        console.log('Connection Failed...');
+    });
+
+It was showing the error that MaongoDB is not connected .
+Why?
+
+Because We have not installed mongodb in our MacOS
+
+home brew ke through install kardo aur phir baad mei mongodb ko start kardo
+and then try npm run dev
+
+It will work absolutely fine
+
+
+Now we need to fetch data from db to show things in our home page
+toh mongoose mei models naam ka ek concept hota hai using which we can do database queries
+
+
+Yaad rakhna MongoDb mei hamesha Collection ka naam hota hai plural
+aur baki models ka naam hota hai singular
+
+agar db mei apna collection name hai Menus hai toh yahan apna model ka naam hoga Menu
+
+
+Toh inside the
+
+app/models/ ---> Create a file named
+<Model_name>.js
+menu.js
+
+Setup an schema isnside of it and then export it, and later use it in the homeController file to fetch the data from DB and 
+send it back to the home.ejs
+Consume the same data that is sent from DB to Front page in home.ejs file use a loop (and use all the data that we hav recieved).
+
+After this,
+
+install some dependencies
+
+dotenv
+express-session
+express-flush
+connect-mongo
+
+Create a .env file and set an Cookie_key there and use it here in server.js file
+express-session is used for creating a session
+connnect-mongo is used to store the session in the database under new collection that we create on thr fly. named session
+
+
+
+What is the next task?
+
+Whatever the item we have, whenever we select an item from home page (click on add button)
+we want that item to add to our cart and also to the session.
+
+
+matlb we want to add that clicked itme to session data and pick that data from session data and disply it here in the cart page
+
+
+Steps:
+We need to write a client end code 
+Open app.js jo linked hai layout.ejs ke saath
+
+1. Add a EventListener to the Add Button 
+
+
+document.querySelectorAll('.add-to-cart').forEach(item => {
+    item.addEventListener('click', event => {
+      console.log(event);
+    })
+  })
+
+2. Now what we want is ki ab aisa kuch ho jaaye ki ye jo Pizza apn ne click kiya hai wo aajaye is file ke andar aur phir is file
+se apn request send karenge apne server ko ki bhai save it in the cart or the session.
+
+Go to the home.ejs
+and inside the button (add wala)
+wahan we will give an data-attribute named as
+data-pizza and we will pass a pizza object to it that we have passed in forEach(pizza) 
+Now ,
+We can access this attribute inside our client with the help of Javascript
+
+Now,
+
+data-pizza = "pizza"
+
+This pizza value is an object, and we cannot bind pizza like the above, we need to first convert it to JSON, pass kardenge 
+phir jab client end par isko fetch karenge toh we will again convert this JSON formatted data to an object
+
+data-pizza="<%= JSON.stringify(pizza) %>"
+
+
+Now we need to fetch it in the app.js file:
+
+
+document.querySelectorAll('.add-to-cart').forEach(item => {
+    item.addEventListener('click', event => {
+      let pizza = item.dataset.pizza;
+      console.log(pizza);
+    })
+  })
+
+Now we need to send the same pizza to to the server
+app.js file me hi thoda code add karenge
+
+function updateCart(pizza)
+{
+
+}
+document.querySelectorAll('.add-to-cart').forEach(item => {
+    item.addEventListener('click', event => {
+      let pizza = item.dataset.pizza;
+      console.log(pizza);
+      updateCart(pizza);
+    })
+  })
+
+Now we need to make an AJAX call to put the same clicked pizza to the cart
+so we will use a library named:
+
+axios
+
+
+function updateCart(pizza)
+{
+    axios.post('/update-cart', pizza).then(res =>
+        {
+            console.log(res);
+        })
+}
+
+It will throww an error as 404.
+
+Why?
+
+Because No Route is present there to handle it.
+
+go to routes/web.js
+
+add this route:
+
+app.post('/update-cart', cartController().update);)
+
+Now go to carcontroller and add a function to it
+update()
+
+
+Now Here we need to write a logic for Putting the pizza details to the session or to the cart
+
+
+update(req, res)
+{
+
+}
+
+
+Is function ke andar, apn ko kuch aise format ka data store karna hai
+
+let cart = {
+    items:
+    {
+        pizzaID: {
+            item: pizzaObject,
+            qty: 0
+        }
+    },
+    totalqty: 0,
+    totalprice: 0
+}
+
+
+Here in this below function we need to write the following code:
+
+1. We need to check whether the request coming to this endpoint /update-cart have a cart or not?
+2. If Cart is not there, Then we have to create one:
+
+For the First Time Creating a Cart,
+and adding a basic object structure
+
+
+    if(!req.session.cart)
+    {
+        req.session.cart = 
+        {
+            items: {},
+            totalqty: 0,
+            totalprice: 0
+        }
+    }
+
+
+
+
+Is tarekke ka cart session ke andar create hoga
+
+    cart = req.session.cart;
+
+    Apn bol re hai ki bhai ya toh naya empty cart jo khali hai, wo bhi is variable ko assign kardo
+    aur agar koi request aari hai jisme already koi cart present hai wo bhi is var ko assign kardo
+
+
+Now, Check whether item exist inside a cart or not ? (The Variable cart)
+matlb we are checking the item in the cart that exist or not?
+
+agar cart mei already wo wala item present hai toh toh we will increase the quantity of that item
+What we are checking ki ,
+Agar cart ke items ke andar wo wala pizza hai ki nai (uski id se)....
+
+
+    if(!cart.items[req.body._id])
+    {
+
+    }
+
+Y sab kaam karenge phir....
+
+Work on Cart Counter part
+Later Popluate the entire cart and then work on the noty part
+At last work on the which section needs to be visible if cart is empty or filled
+
+
+
+Part-9
+Real Time Stuffs Using Socket.io 
+
+
+Now as we were on admin/orders page wahan par agar apn kisi bhi status pe click karte toh we were getting
+the new message as
+
+"Cannot POST /admin/order/status"
+
+Aisa kuo kuoki apne pass aisa koi route define hi nai hai
+Now lets create a route
+
+Go to web.js 
+
+And define the same
+And now create the new controller named "statusController()"
+and under that create a function named update(req, res)
+{
+    //Now here get an order model ,
+    and we will update one order in the database
+}
+
+
+
+const Order = require('../../../models/order');
+
+function statusController()
+{
+    return {
+      update(req, res)
+      {
+        Order.updateOne({ _id: req.body.orderId }, { status: req.body.status }, (err, data)=>
+        {
+            if(err)
+            {
+                return res.redirect('/admin/orders');                
+            }
+            return res.redirect('/admin/orders');
+        })
+      }  
+    }
+}
+
+module.exports = statusController;
+
+Han ab agar apn status change karenge toh it will change perfectly
+
+
+Lets create a single order page
+
+Before this lets check whether we have a specific URL for it or not?
+
+customer/orders/<order_id>
+
+We will create one under the web.js route file
+app.get('/customer/orders:id', auth, orderController().show);
+
+Here, : means that its dynamic har time alg alg id hogi
+
+Ab orderController ke andar ek function banana hai named "show"
+
+toh lets create that
+
+
+
+
+                        SOCKET.io
+
+npm i socket.io
+
+
+
